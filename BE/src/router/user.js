@@ -34,6 +34,7 @@ router.post('/users', async (req, res) => {
             }
             else{
                 console.log('Email Sent successfully');
+                res.status(201)
             }
         });
     }

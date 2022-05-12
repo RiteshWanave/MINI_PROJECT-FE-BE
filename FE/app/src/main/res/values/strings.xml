@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">WalchandEventOrganizer</string>
+    <string name="getstarted"><br>From now onwards using the\n</br><br>Walchnad Event Organizer .which will help you\n</br><br>to list all the events and other happening of\n</br>our college</string>
+    <string name="app_Fname">Walchand Event Organizer</string>
+    <string name="get_started">Get Started!</string>
+</resources>
