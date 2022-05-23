@@ -40,7 +40,7 @@ class SignActivity : AppCompatActivity() {
                     ).show()
                 }
                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                    if (response.code() == 200) {
+                    if (response.code() == 200 || response.code() == 201) {
                         Toast.makeText(this@SignActivity, "Registration success!", Toast.LENGTH_SHORT)
                             .show()
                     }

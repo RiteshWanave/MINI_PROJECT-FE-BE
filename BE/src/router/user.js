@@ -1,8 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const {User, Temp} = require('../models/User.js');
+const {User, Temp, TempClub} = require('../models/User.js');
 const nodemailer = require('nodemailer');
 const auth = require('../middleware/auth.js');
+const { route } = require('express/lib/application');
+
+
+router.get('/', async (req, res) => {
+    res.send("Main Page");
+})
 
 router.post('/users', async (req, res) => {
     try{
@@ -25,7 +31,7 @@ router.post('/users', async (req, res) => {
             from: "demoritv1421@gmail.com",
             to: user.email,
             subject: "Verify Your Email",
-            html: '<p>Click <a href="http://localhost:3000/verifyemail/' + link + '">here</a> to verify your email</p>'
+            html: '<p>Click <a href="https://walchand-event-organizer.herokuapp.com/verifyemail/' + link + '">here</a> to verify your email</p>'
         }
 
         transporter.sendMail(mailOptions, function (err, data) {
@@ -97,6 +103,58 @@ router.get('/users/me/logout', auth, async (req, res) => {
         res.send('logged out successfully');
     }
     catch (error) {
+        res.status(500).send(error)
+    }
+})
+
+router.post('/users/me/applyforclubuser', auth, async (req, res) => {
+    try{
+        const user = await User.applyForClubUser(req.token);
+        const token = req.token;
+        if(user){
+            const message = req.body.message;
+            console.log(message);
+            const isexist = await TempClub.findOne({userToken: token});
+            if(!isexist){
+                const clubdata = new TempClub({userToken: token, message: message});
+                clubdata.save();
+                res.send('applied for club user');
+            }
+            else {
+                console.log('already applied');
+                res.send('already applied for club user');
+            }
+        }
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send(error)
+    }
+})
+
+// router.get('/clubuserrequests', async (req, res) => {
+//     try{
+
+//     }
+//     catch (error) {
+//         res.status(500).send(error)
+//     }
+// })
+
+router.post('/promotetoclubuser', auth, async (req, res) => {
+    try{
+        const token = req.body.token;
+        const user = await User.createClubUser(token, req.token);
+        res.send('promoted to club user');
+        if(user){
+            const temp = await TempClub.findOneAndDelete({userToken: token});
+            if(temp){
+                console.log('club user request deleted');
+            }
+        }
+    }
+    catch (error) {
+        console.log(error);
         res.status(500).send(error)
     }
 })

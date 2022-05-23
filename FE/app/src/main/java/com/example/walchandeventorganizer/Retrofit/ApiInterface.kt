@@ -23,7 +23,7 @@ interface ApiInterface {
 
 class RetrofitInstance {
     companion object {
-        private const val BASE_URL: String = "http://10.0.2.2:3000"
+        private const val BASE_URL: String = "https://walchand-event-organizer.herokuapp.com/"
 
 //        private val interceptor: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
 //            this.level = HttpLoggingInterceptor.Level.BODY

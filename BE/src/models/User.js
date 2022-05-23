@@ -57,6 +57,18 @@ const tempSchema = new mongoose.Schema({
     }
 })
 
+const tempClubSchema = new mongoose.Schema({
+    userToken: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    message:{
+        type: String,
+        required: true
+    }
+})
+
 
 userSchema.pre('save', async function(next) {
     const user = this;
@@ -126,7 +138,36 @@ userSchema.statics.VerifyUser = async function (id) {
 }
 
 
+userSchema.statics.applyForClubUser = async function(token) {
+    const user = await User.findOne({'tokens.token': token, isVerified: true})
+    if(!user){
+        console.log('User Not Found');
+    }
+    else{
+        return user;
+    }
+}
+
+
+userSchema.statics.createClubUser = async function(token, admintoken) {
+    const adminuser = await User.findOne({'tokens.token': admintoken, isAdminUser: true});
+    if(adminuser){
+        await User.findOneAndUpdate({'tokens.token': token, isVerified: true}, {isClubUser: true})
+        const user = await User.findOne({'tokens.token': token, isVerified: true});
+        user.save();
+        if(!user){
+            console.log('User not found');
+        }
+        else{
+            console.log('User Promoted to Club User');
+            return user;
+        }
+    }
+}
+
+
 const User = mongoose.model('User', userSchema);
 const Temp = mongoose.model('Temp', tempSchema);
+const TempClub = mongoose.model('TempClub', tempClubSchema);
 
-module.exports = {User, Temp};
+module.exports = {User, Temp, TempClub};
