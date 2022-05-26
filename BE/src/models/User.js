@@ -165,6 +165,26 @@ userSchema.statics.createClubUser = async function(token, admintoken) {
     }
 }
 
+userSchema.statics.isAdminUser = async function(id) {
+    const user = await User.findOne({_id: id, isAdminUser: true});
+    if(!user){
+        console.log('not admin user');
+    }
+    else{
+        return true;
+    }
+}
+
+userSchema.statics.isClubUser = async function(id) {
+    const user = await User.findOne({_id: id, isClubUser: true});
+    if(!user){
+        console.log('not club user');
+    }
+    else{
+        return true;
+    }
+}
+
 
 const User = mongoose.model('User', userSchema);
 const Temp = mongoose.model('Temp', tempSchema);

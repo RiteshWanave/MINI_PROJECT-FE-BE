@@ -1,4 +1,4 @@
-const mongoose = reqiure('mongoose');
+const mongoose = require('mongoose');
 
 const calendarSchema = new mongoose.Schema({
     eventname: {
@@ -7,7 +7,7 @@ const calendarSchema = new mongoose.Schema({
     },
     date: {
         required : true,
-        type: date,
+        type: Date,
     },
     starttime: {
         required : true,
@@ -40,11 +40,19 @@ const calendarSchema = new mongoose.Schema({
     },
     link: {
         type: String,
-    }
+    },
+    toDelete: {
+        type: Boolean,
+        default: false,
+    },
+    createdBy: {
+        required : true,
+        type: String,
+    },
 })
 
-calendarSchema.statics.checkIsAvailable = function(date, starttime, endtime) {
-    const calendar = this.find({
+calendarSchema.statics.checkIsAvailable = async function(date, starttime, endtime) {
+    const calendar = await Calendar.findOne({
         $and: [
             {date: date},
             { $or: [
@@ -59,11 +67,31 @@ calendarSchema.statics.checkIsAvailable = function(date, starttime, endtime) {
             ]}
         ]
     })
-    if(calendar) {
-        return false;
+    if(!calendar) {
+        return true;
     }
-    return true;
+    console.log(calendar.date);
+    return false;
 }
+
+calendarSchema.statics.deleteEvent = function(name, date, starttime, endtime) {
+    const calendar = this.findOneAndDelete({name: name, date: date, starttime: starttime, endtime: endtime});
+    if(calendar) {
+        return true;
+    }
+    return false;
+}
+
+calendarSchema.statics.requestToDelete = function(name, date, starttime, endtime) {
+    const calendar = this.findOneAndUpdate({name: name, date: date, starttime: starttime, endtime: endtime}, {toDelete: true});
+    if(calendar) {
+        return calendar;
+    }
+    else {
+        console.log('Event not found');
+    }
+}
+
 
 
 const Calendar = mongoose.model('Calendar', calendarSchema);
