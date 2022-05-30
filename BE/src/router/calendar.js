@@ -83,11 +83,12 @@ router.get('/getEvents', auth, async (req, res) => {
         const user = req.user;
         let Date = await currDate();
         console.log(Date);
-        Calendar.find({date: { $gte: Date}}, (err, events) => {
+        Calendar.find((err, events) => {
             if(err) {
                 res.status(400).send(err);
             }
             else {
+                console.log(events);
                 res.status(200).send(events);
             }
         })
