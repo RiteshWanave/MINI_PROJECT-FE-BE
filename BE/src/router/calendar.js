@@ -78,11 +78,11 @@ router.post('/requestToDelete', auth, async (req, res) => {
     }
 })
 
-router.get('/getEvents', auth, async (req, res) => {
+router.get('/getEvents', async (req, res) => {
     try{
-        const user = req.user;
-        let Date = await currDate();
-        console.log(Date);
+        // const user = req.user;
+        // let Date = await currDate();
+        // console.log(Date);
         Calendar.find((err, events) => {
             if(err) {
                 res.status(400).send(err);
