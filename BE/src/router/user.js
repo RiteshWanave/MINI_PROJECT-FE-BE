@@ -4,9 +4,7 @@ const {User, Temp, TempClub} = require('../models/User.js');
 const nodemailer = require('nodemailer');
 const auth = require('../middleware/auth.js');
 const { route } = require('express/lib/application');
-const redis = require('redis');
-const client = redis.createClient();
-client.connect();
+const { setCache, getCache } = require('../middleware/redis.js');
 
 
 router.get('/', async (req, res) => {
@@ -16,7 +14,7 @@ router.get('/', async (req, res) => {
 router.post('/users', async (req, res) => {
     try{
         const user = new User(req.body);
-        await user.generateAuthToken();
+        // await user.generateAuthToken();
         const temp = new Temp({userID: user._id});
         await temp.createRandomString();
         await user.save();
@@ -59,16 +57,7 @@ router.post('/login', async(req, res) => {
         if(check) {
             const user = await User.findByCredentials(req.body.email, req.body.password);
             const token = await user.generateAuthToken();
-            await client.connect()
-            .then(() => {
-                console.log('Connected to Redis');
-            })
-            .catch((error) => {
-                console.log(error);
-                });
-            await client.set('user_token', token);
-            const temp = await client.get('user_token');
-            console.log(temp);
+            setCache(token);
             res.send({user, token});
         }
         else{
