@@ -4,6 +4,8 @@ const {User, Temp, TempClub} = require('../models/User.js');
 const nodemailer = require('nodemailer');
 const auth = require('../middleware/auth.js');
 const { route } = require('express/lib/application');
+const redis = require('redis');
+const client = redis.createClient();
 
 
 router.get('/', async (req, res) => {
@@ -56,6 +58,14 @@ router.post('/login', async(req, res) => {
         if(check) {
             const user = await User.findByCredentials(req.body.email, req.body.password);
             const token = await user.generateAuthToken();
+            // await client.connect()
+            // .then(() => {
+            //     console.log('Connected to Redis');
+            // })
+            // .catch((error) => {
+            //     console.log(error);
+            //     });
+            // await client.set(user_token, token);
             res.send({user, token});
         }
         else{
