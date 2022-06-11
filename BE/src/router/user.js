@@ -5,10 +5,13 @@ const nodemailer = require('nodemailer');
 const auth = require('../middleware/auth.js');
 const { route } = require('express/lib/application');
 const { setCache, getCache } = require('../middleware/redis.js');
+const path = require('path');
+
 
 
 router.get('/', async (req, res) => {
     res.send("Main Page");
+    
 })
 
 router.post('/users', async (req, res) => {
@@ -82,7 +85,8 @@ router.get('/verifyemail/:id/:string', async (req, res) => {
             if(user){
                 console.log('user verified');
                 console.log({user});
-                res.send('user verified');
+                // res.send('user verified');
+                res.sendFile(path.join(__dirname, '../public/verified.html'));
             }
         }
     }
