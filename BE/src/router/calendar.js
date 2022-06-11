@@ -81,9 +81,9 @@ router.post('/requestToDelete', auth, async (req, res) => {
 router.get('/getEvents', async (req, res) => {
     try{
         // const user = req.user;
-        // let Date = await currDate();
-        // console.log(Date);
-        Calendar.find((err, events) => {
+        let Date = await currDate();
+        console.log(Date);
+        Calendar.find( {date: {$gte: Date }}, (err, events) => {
             if(err) {
                 res.status(400).send(err);
             }
@@ -91,7 +91,7 @@ router.get('/getEvents', async (req, res) => {
                 console.log(events);
                 res.status(200).send(events);
             }
-        })
+        }).sort({date: 1})
     }
     catch (error) {
         console.log(error);
@@ -107,12 +107,7 @@ module.exports = router;
 
 
 currDate = async function() {
-    let date_ob = new Date();
-    console.log(date_ob.getHours() + ":" + date_ob.getMinutes() + ":" + date_ob.getSeconds());
-    date_ob.setHours(date_ob.getHours());
-    let cd = date_ob.setMinutes(date_ob.getMinutes() - date_ob.getTimezoneOffset());
-
-    // date_ob.setHours(0);
-    // date_ob.setMinutes(0);
-    return date_ob;
+    const currdate = new Date()
+    const result = currdate.toISOString().split('T')[0]
+    return result;
 }
