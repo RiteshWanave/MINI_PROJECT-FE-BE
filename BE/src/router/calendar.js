@@ -3,6 +3,7 @@ const router = express.Router();
 const {User, Temp} = require('../models/User.js');
 const Calendar = require('../models/Calendar.js');
 const auth = require('../middleware/auth.js');
+const currDate = require('../middleware/chechDate')
 
 router.post('/insertevent', auth, async (req, res) => {
     try{
@@ -106,8 +107,3 @@ router.get('/getEvents', async (req, res) => {
 module.exports = router;    
 
 
-currDate = async function() {
-    const currdate = new Date()
-    const result = currdate.toISOString().split('T')[0]
-    return result;
-}
