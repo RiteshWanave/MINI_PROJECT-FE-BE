@@ -5,6 +5,8 @@ const crypto = require('crypto');
 const validator = require('validator');
 const { log } = require('console');
 
+
+// User Information Schema
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -47,6 +49,8 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
+
+// Temp Information Schema gets cleared when user is verified
 const tempSchema = new mongoose.Schema({
     userID: {
         type: String,
@@ -58,6 +62,8 @@ const tempSchema = new mongoose.Schema({
     }
 })
 
+
+// Temp Information Schema gets cleared when user is promoted to club user else when request for clubuser is rejected
 const tempClubSchema = new mongoose.Schema({
     userToken: {
         type: String,
@@ -71,6 +77,7 @@ const tempClubSchema = new mongoose.Schema({
 })
 
 
+// user information gets some channges before storing it to database
 userSchema.pre('save', async function(next) {
     const user = this;
     if(user.isModified('password')) {
@@ -79,6 +86,8 @@ userSchema.pre('save', async function(next) {
     next();
 })
 
+
+// generate token for user
 userSchema.methods.generateAuthToken = async function() {
     const user = this;
     const token = jwt.sign({_id: user._id}, process.env.SECRET_KEY);
@@ -87,6 +96,8 @@ userSchema.methods.generateAuthToken = async function() {
     return token;
 }
 
+
+// check if user is verified by user email
 userSchema.statics.isUserVerified = async function(email) {
     const user = await User.findOne({email: email});
     if(!user) {
@@ -95,6 +106,8 @@ userSchema.statics.isUserVerified = async function(email) {
     return user.isVerified;
 }
 
+
+//  Login User
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({email: email});
     if(!user) {
@@ -107,6 +120,8 @@ userSchema.statics.findByCredentials = async (email, password) => {
     return user;
 }
 
+
+// create random string for mail verification
 tempSchema.methods.createRandomString = async function() {
     const temp = this;
     const string = crypto.randomBytes(4).toString('hex');
@@ -115,6 +130,8 @@ tempSchema.methods.createRandomString = async function() {
     return string;
 }
 
+
+// after clicking link in mail, it checks for temporary user in Temp schema and if found, it updates the user to verified user
 tempSchema.statics.findForVerification = async function (id, randomstring) {
     const temp = await Temp.findOne({userID: id, randomstring: randomstring});
     await Temp.deleteOne({userID: id, randomstring: randomstring});
@@ -125,7 +142,6 @@ tempSchema.statics.findForVerification = async function (id, randomstring) {
         return temp;
     }
 }
-
 userSchema.statics.VerifyUser = async function (id) {
     await User.findOneAndUpdate({_id: id}, {isVerified: true});
     const user = await User.findById(id);
@@ -139,6 +155,7 @@ userSchema.statics.VerifyUser = async function (id) {
 }
 
 
+// for applying for club user it checks is user verified via token
 userSchema.statics.applyForClubUser = async function(token) {
     const user = await User.findOne({'tokens.token': token, isVerified: true})
     if(!user){
@@ -150,6 +167,7 @@ userSchema.statics.applyForClubUser = async function(token) {
 }
 
 
+// Promote User to Club User
 userSchema.statics.createClubUser = async function(token, admintoken) {
     const adminuser = await User.findOne({'tokens.token': admintoken, isAdminUser: true});
     if(adminuser){
@@ -166,6 +184,8 @@ userSchema.statics.createClubUser = async function(token, admintoken) {
     }
 }
 
+
+// check if user is admin user
 userSchema.statics.isAdminUser = async function(id) {
     const user = await User.findOne({_id: id, isAdminUser: true});
     if(!user){
@@ -176,6 +196,8 @@ userSchema.statics.isAdminUser = async function(id) {
     }
 }
 
+
+// check if user is club user
 userSchema.statics.isClubUser = async function(id) {
     const user = await User.findOne({_id: id, isClubUser: true});
     if(!user){

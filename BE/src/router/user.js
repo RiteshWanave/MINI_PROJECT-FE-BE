@@ -138,9 +138,10 @@ router.post('/users/me/applyforclubuser', auth, async (req, res) => {
     }
 })
 
-// router.get('/clubuserrequests', async (req, res) => {
+// router.get('/clubuserRequests', async (req, res) => {
 //     try{
-
+//         const requests = await TempClub.find({});
+//         res.send(requests);
 //     }
 //     catch (error) {
 //         res.status(500).send(error)
