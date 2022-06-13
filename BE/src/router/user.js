@@ -33,6 +33,20 @@ router.post('/users', async (req, res) => {
     }
 })
 
+router.post('/resendEmail', async (req, res) => {
+    try{
+        const user = await User.findOne({email: req.body.email});
+        const temp = await Temp.findOne({userID: user._id});
+        const link = user._id + '/' + temp.randomstring;
+        sendEmail(link, user);
+        res.send('Email sent');
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).send(error);
+    }
+})
+
 router.post('/login', async(req, res) => {
     try{
         const check = await User.isUserVerified(req.body.email);
@@ -95,13 +109,12 @@ router.get('/users/me/logout', auth, async (req, res) => {
 router.post('/users/me/applyforclubuser', auth, async (req, res) => {
     try{
         const user = await User.applyForClubUser(req.token);
-        const token = req.token;
         if(user){
             const message = req.body.message;
             console.log(message);
-            const isexist = await TempClub.findOne({userToken: token});
+            const isexist = await TempClub.findOne({userEmail: user.email});
             if(!isexist){
-                const clubdata = new TempClub({userToken: token, message: message});
+                const clubdata = new TempClub({userEmail: user.email, message: message});
                 clubdata.save();
                 res.send('applied for club user');
             }
@@ -129,11 +142,11 @@ router.post('/users/me/applyforclubuser', auth, async (req, res) => {
 
 router.post('/promotetoclubuser', auth, async (req, res) => {
     try{
-        const token = req.body.token;
-        const user = await User.createClubUser(token, req.token);
+        const email = req.body.email;
+        const user = await User.createClubUser(email, req.token);
         res.send('promoted to club user');
         if(user){
-            const temp = await TempClub.findOneAndDelete({userToken: token});
+            const temp = await TempClub.findOneAndDelete({userEmail: email});
             if(temp){
                 console.log('club user request deleted');
             }

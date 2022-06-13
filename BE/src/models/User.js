@@ -65,7 +65,7 @@ const tempSchema = new mongoose.Schema({
 
 // Temp Information Schema gets cleared when user is promoted to club user else when request for clubuser is rejected
 const tempClubSchema = new mongoose.Schema({
-    userToken: {
+    userEmail: {
         type: String,
         required: true,
         unique: true
@@ -168,18 +168,18 @@ userSchema.statics.applyForClubUser = async function(token) {
 
 
 // Promote User to Club User
-userSchema.statics.createClubUser = async function(token, admintoken) {
+userSchema.statics.createClubUser = async function(email, admintoken) {
     const adminuser = await User.findOne({'tokens.token': admintoken, isAdminUser: true});
     if(adminuser){
-        await User.findOneAndUpdate({'tokens.token': token, isVerified: true}, {isClubUser: true})
-        const user = await User.findOne({'tokens.token': token, isVerified: true});
+        await User.findOneAndUpdate({email: email, isVerified: true}, {isClubUser: true})
+        const user = await User.findOne({email: email, isVerified: true});
         user.save();
         if(!user){
             console.log('User not found');
         }
         else{
             console.log('User Promoted to Club User');
-            return user;
+            return user; 
         }
     }
 }

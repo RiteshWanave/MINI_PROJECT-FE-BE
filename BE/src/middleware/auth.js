@@ -6,8 +6,8 @@ const { setCache, getCache } = require('../middleware/redis.js');
 
 
 const auth = async (req, res, next) => {
-    // const token = req.header('Authorization').replace('Bearer ','');
-    const token = getCache();
+    const token = req.header('Authorization').replace('Bearer ','');
+    // const token = getCache();
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
     try{
         const user = await User.findOne({_id: decoded._id, 'tokens.token': token})
