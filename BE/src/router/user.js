@@ -6,6 +6,7 @@ const auth = require('../middleware/auth.js');
 const { route } = require('express/lib/application');
 const { setCache, getCache } = require('../middleware/redis.js');
 const path = require('path');
+const sendEmail = require('../middleware/nodemailer.js');
 
 
 
@@ -23,30 +24,8 @@ router.post('/users', async (req, res) => {
         await user.save();
         await temp.save();
         res.send({user, temp});
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.ADMIN_EMAIL,
-                pass: process.env.ADMIN_PASSWORD
-            }
-        });
         const link = user._id + '/' + temp.randomstring;
-        const mailOptions = {
-            from: "demoritv1421@gmail.com",
-            to: user.email,
-            subject: "Verify Your Email",
-            html: '<p>Click <a href="https://walchand-event-organizer.herokuapp.com/verifyemail/' + link + '">here</a> to verify your email</p>'
-        }
-
-        transporter.sendMail(mailOptions, function (err, data) {
-            if(err){
-                console.log(err);
-            }
-            else{
-                console.log('Email Sent successfully');
-                res.status(201)
-            }
-        });
+        sendEmail(link, user);
     }
     catch (error) {
         console.log(error);
