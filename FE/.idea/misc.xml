@@ -3,26 +3,23 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/Lenovo/Desktop/MP/WalchandEventOrganizer/app/src/main/res/layout/login_screen.xml" value="0.18819655521783182" />
-        <entry key="..\:/Users/Lenovo/Desktop/MP/WalchandEventOrganizer/app/src/main/res/layout/signup_screen.xml" value="0.18819655521783182" />
-        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2075" />
-        <entry key="app/src/main/res/drawable/background.xml" value="0.2075" />
-        <entry key="app/src/main/res/drawable/ic_arrow.xml" value="0.3595" />
-        <entry key="app/src/main/res/drawable/ic_logo.xml" value="0.2075" />
-        <entry key="app/src/main/res/drawable/onboarding_confused_img.xml" value="0.2075" />
-        <entry key="app/src/main/res/drawable/onboarding_getstarted.xml" value="0.2075" />
-        <entry key="app/src/main/res/drawable/onboardingtimemanage_img.xml" value="0.2075" />
-        <entry key="app/src/main/res/drawable/weologo.xml" value="0.2075" />
-        <entry key="app/src/main/res/drawable/whitecard.xml" value="0.2075" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.35833333333333334" />
-        <entry key="app/src/main/res/layout/activity_welcome.xml" value="0.2318840579710145" />
-        <entry key="app/src/main/res/layout/onboarding_confused_screen.xml" value="0.35833333333333334" />
-        <entry key="app/src/main/res/layout/onboarding_confused_screen1.xml" value="0.2318840579710145" />
-        <entry key="app/src/main/res/layout/onboarding_getstarted.xml" value="0.35833333333333334" />
-        <entry key="app/src/main/res/layout/onboarding_timemgmt.xml" value="0.2318840579710145" />
-        <entry key="app/src/main/res/layout/onboardingtimemanage_screen.xml" value="0.35833333333333334" />
-        <entry key="app/src/main/res/layout/signup_screen.xml" value="0.17426545086119555" />
-        <entry key="app/src/main/res/layout/welcome_screen.xml" value="0.2318840579710145" />
+        <entry key="app/src/main/res/drawable-v24/calendar_whitecard.xml" value="0.284" />
+        <entry key="app/src/main/res/drawable-v24/middlewhitecard.xml" value="0.284" />
+        <entry key="app/src/main/res/drawable-v24/round.xml" value="0.2065" />
+        <entry key="app/src/main/res/drawable/border.xml" value="0.2065" />
+        <entry key="app/src/main/res/drawable/ic_arrow_back.xml" value="0.2465" />
+        <entry key="app/src/main/res/drawable/round.xml" value="0.2065" />
+        <entry key="app/src/main/res/layout-v28/fragment_registration_form_one.xml" value="0.33541666666666664" />
+        <entry key="app/src/main/res/layout/activity_admin_home.xml" value="0.287962962962963" />
+        <entry key="app/src/main/res/layout/dropdownitem.xml" value="0.334375" />
+        <entry key="app/src/main/res/layout/event_list.xml" value="0.33541666666666664" />
+        <entry key="app/src/main/res/layout/fragment_calendar.xml" value="0.35833333333333334" />
+        <entry key="app/src/main/res/layout/fragment_event_list.xml" value="0.3302564102564103" />
+        <entry key="app/src/main/res/layout/fragment_registration__form2.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_registration__form_.xml" value="0.35833333333333334" />
+        <entry key="app/src/main/res/layout/fragment_registration_form.xml" value="0.35833333333333334" />
+        <entry key="app/src/main/res/layout/fragment_registration_form_one.xml" value="0.35833333333333334" />
+        <entry key="app/src/main/res/layout/round.xml" value="0.334375" />
       </map>
     </option>
   </component>
