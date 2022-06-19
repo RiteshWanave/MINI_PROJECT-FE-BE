@@ -6,7 +6,7 @@ const myCache = new NodeCache();
 
 const auth = async (req, res, next) => {
     // const token = req.header('Authorization').replace('Bearer ','');
-    const token = myCache.get(req.params.id);
+    const token = req.params.token;
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
     try{
         const user = await User.findOne({_id: decoded._id, 'tokens.token': token})

@@ -5,16 +5,17 @@ const Calendar = require('../models/Calendar.js');
 const auth = require('../middleware/auth.js');
 const currDate = require('../middleware/chechDate');
 const NodeCache = require('node-cache');
-const myCache = new NodeCache();
+const myCache = new NodeCache()
+const setendtime = require('../middleware/setendtime');
 
-router.post('/insertevent', async (req, res) => {
+router.post('/insertevent/:token', auth, async (req, res) => {
     try{
-        //const user = req.user;
-        //const isAuthorized = await true || User.isAdminUser(user.id) || await User.isClubUser(user.id);
-        const isAuthorized = true;
+        const user = req.user;
+        const isAuthorized = User.isAdminUser(user.id) || await User.isClubUser(user.id);
         if(isAuthorized){
             const calendar = new Calendar(req.body);
-            //calendar.createdBy = user.email;
+            calendar.createdBy = user.name;
+            calendar.endtime = setendtime(calendar.starttime, calendar.duration);
             const checkIsAvailable = await Calendar.checkIsAvailable(calendar.date, calendar.starttime, calendar.endtime);
             if(checkIsAvailable) {
                 await calendar.save();
@@ -95,37 +96,13 @@ router.get('/getEvents', async (req, res) => {
         else{
             let Date = await currDate();
             console.log(Date);
-            // Calendar.find( {date: {$gte: Date }}, async (err, events) => {
-            //     if(err) {
-            //        res.status(400).send(err);
-            //     }
-            //   else {
-            //         console.log('server data is');
-            //         const is = myCache.set("events", events);
-            //         console.log(events);
-            //         res.status(200).send(events);
-            //     }
-            // }).sort({date: 1})
             console.log('from server');
             const events = JSON.stringify(await Calendar.find( {date: {$gte: Date }}).sort({date: 1}));
-            myCache.set('events', events);
+            myCache.set('events', events, 3600);
             const data = myCache.get('events');
             console.log(JSON.parse(data));
             res.status(200).send(JSON.parse(events));
         }
-        // let Date = await currDate();
-        //     console.log(Date);
-        //     Calendar.find( {date: {$gte: Date }}, async (err, events) => {
-        //         if(err) {
-        //            res.status(400).send(err);
-        //         }
-        //       else {
-        //             //const is = myCache.set("events", events);
-        //             console.log('server data is');
-        //             console.log(events);
-        //             res.status(200).send(events);
-        //         }
-        //     }).sort({date: 1})
     }
     catch (error) {
         console.log(error);

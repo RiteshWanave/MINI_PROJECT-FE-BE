@@ -14,7 +14,7 @@ const calendarSchema = new mongoose.Schema({
         type: String,
     },
     endtime: {
-        //required : true,
+        required : true,
         type: String,
     },
     description: {
@@ -45,11 +45,17 @@ const calendarSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    duration: {
+        type: String,
+        required: true,
+    },
     createdBy: {
-        //required : true,
+        required : true,
         type: String,
     },
 })
+
+
 
 calendarSchema.statics.checkIsAvailable = async function(date, starttime, endtime) {
     const calendar = await Calendar.findOne({
