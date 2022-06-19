@@ -40,13 +40,16 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    tokens: [{
-        token: {
-            type: String,
-            required: true
-        },
-        default: []
-    }]
+    clubNameShort: {
+        type: String
+    },
+    clubNameLong: {
+        type: String
+    },
+    token: {
+        type: String,
+        default: ''
+    }
 })
 
 
@@ -70,6 +73,14 @@ const tempClubSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    clubNameShort: {
+        type: String,
+        required: true
+    },
+    clubNameLong: {
+        type: String,
+        required: true
+    },
     message:{
         type: String,
         required: true
@@ -91,7 +102,7 @@ userSchema.pre('save', async function(next) {
 userSchema.methods.generateAuthToken = async function() {
     const user = this;
     const token = jwt.sign({_id: user._id}, process.env.SECRET_KEY);
-    user.tokens = user.tokens.concat({token});
+    user.token = token;
     await user.save();
     return token;
 }
@@ -168,11 +179,11 @@ userSchema.statics.applyForClubUser = async function(token) {
 
 
 // Promote User to Club User
-userSchema.statics.createClubUser = async function(email, admintoken) {
+userSchema.statics.createClubUser = async function(tempclub, admintoken) {
     const adminuser = await User.findOne({'tokens.token': admintoken, isAdminUser: true});
     if(adminuser){
-        await User.findOneAndUpdate({email: email, isVerified: true}, {isClubUser: true})
-        const user = await User.findOne({email: email, isVerified: true});
+        await User.findOneAndUpdate({email: tempclub.userEmail, isVerified: true}, {isClubUser: true, clubNameShort: tempclub.clubNameShort, clubNameLong: tempclub.clubNameLong});
+        const user = await User.findOne({email: tempclub.userEmail, isVerified: true});
         user.save();
         if(!user){
             console.log('User not found');

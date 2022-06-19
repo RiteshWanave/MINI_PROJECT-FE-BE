@@ -4,10 +4,11 @@ const {User, Temp, TempClub} = require('../models/User.js');
 const nodemailer = require('nodemailer');
 const auth = require('../middleware/auth.js');
 const { route } = require('express/lib/application');
-const { setCache, getCache } = require('../middleware/redis.js');
 const path = require('path');
 const sendEmail = require('../middleware/nodemailer.js');
-
+const { log } = require('console');
+const NodeCache = require('node-cache');
+const myCache = new NodeCache();
 
 
 router.get('/', async (req, res) => {
@@ -29,7 +30,14 @@ router.post('/users', async (req, res) => {
     }
     catch (error) {
         console.log(error);
-        res.status(400).send(error);
+        if(error.code === 11000) {
+            res.message = "Email already exists";
+            console.log(res.message);
+            res.status(401).send(res.message);
+        }
+        else {
+            res.status(400).send('user not created');
+        }
     }
 })
 
@@ -53,7 +61,8 @@ router.post('/login', async(req, res) => {
         if(check) {
             const user = await User.findByCredentials(req.body.email, req.body.password);
             const token = await user.generateAuthToken();
-            setCache(token);
+            myCache.del(user._id.toString());
+            myCache.set(user._id.toString(), token);
             res.send({user, token});
         }
         else{
@@ -89,15 +98,19 @@ router.get('/verifyemail/:id/:string', async (req, res) => {
     }
 })
 
-router.get('/users/me', auth, async (req, res) => {
-    res.send(req.user)
+router.get('/users/me/:id', auth, async (req, res) => {
+    try {
+        res.send(req.user);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).send(error);
+    }
 })
 
-router.get('/users/me/logout', auth, async (req, res) => {
+router.get('/users/me/logout/:id', auth, async (req, res) => {
     try{
-        req.user.tokens = req.user.tokens.filter((token) => {
-            return token.token != req.token;
-        });
+        req.user.token = '';
         await req.user.save();
         res.send('logged out successfully');
     }
@@ -106,15 +119,17 @@ router.get('/users/me/logout', auth, async (req, res) => {
     }
 })
 
-router.post('/users/me/applyforclubuser', auth, async (req, res) => {
+router.post('/users/me/applyforclubuser/:id', auth, async (req, res) => {
     try{
         const user = await User.applyForClubUser(req.token);
         if(user){
             const message = req.body.message;
+            const clubNameShort = req.body.clubNameShort;
+            const clubNameLong = req.body.clubNameLong;
             console.log(message);
             const isexist = await TempClub.findOne({userEmail: user.email});
             if(!isexist){
-                const clubdata = new TempClub({userEmail: user.email, message: message});
+                const clubdata = new TempClub({userEmail: user.email, message: message, clubNameShort: clubNameShort, clubNameLong: clubNameLong});
                 clubdata.save();
                 res.send('applied for club user');
             }
@@ -130,26 +145,32 @@ router.post('/users/me/applyforclubuser', auth, async (req, res) => {
     }
 })
 
-// router.get('/clubuserRequests', async (req, res) => {
-//     try{
-//         const requests = await TempClub.find({});
-//         res.send(requests);
-//     }
-//     catch (error) {
-//         res.status(500).send(error)
-//     }
-// })
+router.get('/clubuserRequests', async (req, res) => {
+    try{
+        const requests = await TempClub.find({});
+        res.send(requests);
+    }
+    catch (error) {
+        res.status(500).send(error)
+    }
+})
 
-router.post('/promotetoclubuser', auth, async (req, res) => {
+router.post('/user/me/promotetoclubuser/:id', auth, async (req, res) => {
     try{
         const email = req.body.email;
-        const user = await User.createClubUser(email, req.token);
-        res.send('promoted to club user');
-        if(user){
-            const temp = await TempClub.findOneAndDelete({userEmail: email});
-            if(temp){
-                console.log('club user request deleted');
+        const tempclub = await TempClub.findOne({userEmail: email});
+        if(tempclub){
+            const user = await User.createClubUser(tempclub, req.token);
+            res.send('promoted to club user');
+            if(user){
+                const temp = await TempClub.findOneAndDelete({userEmail: email});
+                if(temp){
+                    console.log('club user request deleted');
+                }
             }
+        }
+        else{
+            res.send('no request found');
         }
     }
     catch (error) {
@@ -157,5 +178,24 @@ router.post('/promotetoclubuser', auth, async (req, res) => {
         res.status(500).send(error)
     }
 })
+
+// Temp code 
+router.get('/getuserdetails/:email', async (req, res) => {
+    try {
+        const email = req.params.email;
+        const temp = await User.findOne({email: email});
+        if(temp){
+            res.status(200).send(temp);
+        }
+        else{
+            res.status(400).send('user not found');
+        }
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+});
+
 
 module.exports = router;

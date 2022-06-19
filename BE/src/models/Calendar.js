@@ -14,11 +14,11 @@ const calendarSchema = new mongoose.Schema({
         type: String,
     },
     endtime: {
-        required : true,
+        //required : true,
         type: String,
     },
     description: {
-        required : true,
+        //required : true,
         type: String,
     },
     areaofinterest: [{
@@ -46,7 +46,7 @@ const calendarSchema = new mongoose.Schema({
         default: false,
     },
     createdBy: {
-        required : true,
+        //required : true,
         type: String,
     },
 })
@@ -89,6 +89,21 @@ calendarSchema.statics.requestToDelete = function(name, date, starttime, endtime
     }
     else {
         console.log('Event not found');
+    }
+}
+
+async function insert_excel(path) {
+    try {
+        const wb = xlsx.readFile(path);
+        const ws = wb.Sheets['Sheet1'];
+        const data = xlsx.utils.sheet_to_json(ws);
+        for(let i = 0; i < data.length; i++) {
+            const calendar = new Calendar(data[i]);
+            await calendar.save();
+        }
+    }
+    catch (error) {
+        console.log(error);
     }
 }
 

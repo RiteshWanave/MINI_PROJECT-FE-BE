@@ -1,13 +1,12 @@
 const jwt = require('jsonwebtoken');
 const {User, Temp} = require('../models/User.js');
-const redis = require('redis');
-const client = redis.createClient();
-const { setCache, getCache } = require('../middleware/redis.js');
+const NodeCache = require('node-cache');
+const myCache = new NodeCache();
 
 
 const auth = async (req, res, next) => {
-    const token = req.header('Authorization').replace('Bearer ','');
-    // const token = getCache();
+    // const token = req.header('Authorization').replace('Bearer ','');
+    const token = myCache.get(req.params.id);
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
     try{
         const user = await User.findOne({_id: decoded._id, 'tokens.token': token})

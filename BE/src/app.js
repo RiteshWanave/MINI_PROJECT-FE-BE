@@ -6,7 +6,6 @@ const userRouter = require('./router/user');
 const calendarRouter = require('./router/calendar');
 
 require('./DB/db');
-
 app.use(express.json());
 
 app.use(userRouter, calendarRouter);
